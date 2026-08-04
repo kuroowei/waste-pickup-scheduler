@@ -1,0 +1,109 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  RESIDENT
+  ADMIN
+}
+
+enum PickupStatus {
+  PENDING
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  SKIPPED
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+}
+
+model User {
+  id            String          @id @default(cuid())
+  fullName      String
+  email         String          @unique
+  phone         String?
+  password      String
+  role          Role            @default(RESIDENT)
+  address       String?
+  createdAt     DateTime        @default(now())
+  pickups       PickupRequest[]
+  feedback      Feedback[]
+  complaints    Complaint[]
+  notifications Notification[]
+}
+
+model WasteType {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  description String?
+  pickups     PickupRequest[]
+}
+
+model PickupRequest {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  wasteTypeId String
+  wasteType   WasteType    @relation(fields: [wasteTypeId], references: [id])
+  pickupDate  DateTime
+  pickupTime  String
+  address     String
+  latitude    Float?
+  longitude   Float?
+  status      PickupStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime     @default(now())
+  feedback    Feedback?
+  complaints  Complaint[]
+}
+
+model Feedback {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  pickupId  String        @unique
+  pickup    PickupRequest @relation(fields: [pickupId], references: [id])
+  rating    Int
+  comments  String?
+  createdAt DateTime      @default(now())
+}
+
+model Complaint {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+  pickupId  String?
+  pickup    PickupRequest?  @relation(fields: [pickupId], references: [id])
+  subject   String
+  message   String
+  status    ComplaintStatus @default(OPEN)
+  createdAt DateTime        @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id            String   @id @default(cuid())
+  title         String
+  message       String
+  publishedDate DateTime @default(now())
+}
