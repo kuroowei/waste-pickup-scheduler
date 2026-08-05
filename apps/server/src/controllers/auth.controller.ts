@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, AuthError } from '../services/auth.service';
+import { registerUser, loginUser, getCurrentUser, AuthError } from '../services/auth.service';
 import { isValidEmail, isValidPassword } from '../utils/validation';
 import { verifyRefreshToken, signAccessToken, TokenPayload } from '../utils/jwt';
+import { AuthenticatedRequest } from '../middleware/auth.middleware';
 
 const REFRESH_COOKIE_NAME = 'refreshToken';
 
@@ -80,5 +81,18 @@ export function refreshToken(req: Request, res: Response) {
     return res.status(200).json({ accessToken: newAccessToken });
   } catch {
     return res.status(401).json({ error: 'Invalid or expired refresh token' });
+  }
+}
+
+export async function me(req: AuthenticatedRequest, res: Response) {
+  try {
+    const user = await getCurrentUser(req.user!.userId);
+    return res.status(200).json({ user });
+  } catch (err) {
+    if (err instanceof AuthError) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+    console.error(err);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }

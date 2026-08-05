@@ -68,3 +68,10 @@ export async function loginUser(email: string, password: string) {
 
   return { user: sanitizeUser(user), accessToken, refreshToken };
 }
+export async function getCurrentUser(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new AuthError('User not found', 404);
+  }
+  return sanitizeUser(user);
+}
