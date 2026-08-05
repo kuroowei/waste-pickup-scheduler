@@ -5,6 +5,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes';
+import pickupRoutes from './routes/pickup.routes';
+import wasteTypeRoutes from './routes/wasteType.routes';
 
 const app = express();
 
@@ -14,7 +16,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
-
+app.use('/api/pickup', pickupRoutes);
+app.use('/api/waste-types', wasteTypeRoutes);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'waste-pickup-scheduler-api' });
 });
@@ -23,4 +26,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+
 });
