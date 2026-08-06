@@ -8,6 +8,8 @@ import authRoutes from './routes/auth.routes';
 import pickupRoutes from './routes/pickup.routes';
 import wasteTypeRoutes from './routes/wasteType.routes';
 import adminRoutes from './routes/admin.routes';
+import feedbackRoutes from './routes/feedback.routes';
+import complaintRoutes from './routes/complaint.routes';
 
 const app = express();
 
@@ -20,7 +22,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/pickup', pickupRoutes);
 app.use('/api/waste-types', wasteTypeRoutes);
 app.use('/api/admin', adminRoutes);
-
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/complaints', complaintRoutes);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'waste-pickup-scheduler-api' });
 });
