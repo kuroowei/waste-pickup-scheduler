@@ -1,5 +1,6 @@
 import { apiClient } from './client';
 import type { PickupRequest, PickupStatus } from '../types';
+import type { Feedback } from './feedback';
 
 export interface AdminStats {
   totalUsers: number;
@@ -38,4 +39,14 @@ export async function getAllPickups(status?: PickupStatus): Promise<PickupReques
 export async function updatePickupStatus(id: string, status: PickupStatus): Promise<PickupRequest> {
   const { data } = await apiClient.put(`/admin/pickups/${id}/status`, { status });
   return data.pickup;
+}
+
+export interface AdminFeedback extends Feedback {
+  user: { id: string; fullName: string; email: string; phone?: string };
+  pickup: { wasteType: { name: string } };
+}
+
+export async function getAllFeedback(): Promise<AdminFeedback[]> {
+  const { data } = await apiClient.get('/admin/feedback');
+  return data.feedback;
 }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminStats, getAllUsers, getAllPickups, updatePickupStatus } from '../api/admin';
 import type { PickupStatus } from '../types';
+import { getAllFeedback } from '../api/admin';
 
 export function useAdminStats() {
   return useQuery({ queryKey: ['admin', 'stats'], queryFn: getAdminStats });
@@ -25,4 +26,7 @@ export function useUpdatePickupStatus() {
       queryClient.invalidateQueries({ queryKey: ['admin'] });
     },
   });
+}
+export function useAdminFeedback() {
+  return useQuery({ queryKey: ['admin', 'feedback'], queryFn: getAllFeedback });
 }

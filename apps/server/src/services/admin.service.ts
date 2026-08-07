@@ -75,3 +75,12 @@ export async function getDashboardStats() {
 
   return { totalUsers, todaysPickups, completed, pending, cancelled };
 }
+export async function getAllFeedback() {
+  return prisma.feedback.findMany({
+    include: {
+      user: { select: { id: true, fullName: true, email: true, phone: true } },
+      pickup: { include: { wasteType: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}

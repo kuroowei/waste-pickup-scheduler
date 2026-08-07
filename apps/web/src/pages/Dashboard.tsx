@@ -5,6 +5,7 @@ import { useUpcomingPickups, usePickupHistory, useCancelPickup } from '../hooks/
 import { PickupCard } from '../components/PickupCard';
 import { ScheduleForm } from '../components/ScheduleForm';
 import { ComplaintForm } from '../components/ComplaintForm';
+import { useMyFeedback } from '../hooks/useFeedback';
 
 type Tab = 'upcoming' | 'schedule' | 'history' | 'complaints';
 
@@ -15,6 +16,7 @@ export function Dashboard() {
   const upcoming = useUpcomingPickups();
   const history = usePickupHistory();
   const cancelPickup = useCancelPickup();
+  const myFeedback = useMyFeedback();
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -112,7 +114,12 @@ export function Dashboard() {
               <p className="text-center py-12 text-slate-400">No pickup history yet</p>
             )}
             {history.data?.map((pickup) => (
-              <PickupCard key={pickup.id} pickup={pickup} allowRating />
+              <PickupCard
+                key={pickup.id}
+                pickup={pickup}
+                allowRating
+                existingFeedback={myFeedback.data?.find((f) => f.pickupId === pickup.id)}
+              />
             ))}
           </div>
         )}

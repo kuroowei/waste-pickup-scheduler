@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { LogOut, Users, Truck, LayoutDashboard, Clock, CheckCircle2, XCircle, CalendarDays, MessageSquareWarning } from 'lucide-react';
+import { LogOut, Users, Truck, LayoutDashboard, Clock, CheckCircle2, XCircle, CalendarDays, MessageSquareWarning, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useAdminStats, useAdminUsers, useAdminPickups } from '../hooks/useAdmin';
+import { useAdminStats, useAdminUsers, useAdminPickups, useAdminFeedback } from '../hooks/useAdmin';
 import { useAllComplaints } from '../hooks/useComplaints';
 import { StatsCard } from '../components/StatsCard';
 import { UserTable } from '../components/UserTable';
 import { AdminPickupTable } from '../components/AdminPickupTable';
 import { ComplaintTable } from '../components/ComplaintTable';
+import { RatingsTable } from '../components/RatingsTable';
 
-type Tab = 'overview' | 'users' | 'pickups' | 'complaints';
+type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -18,6 +19,7 @@ export function AdminDashboard() {
   const users = useAdminUsers();
   const pickups = useAdminPickups();
   const complaints = useAllComplaints();
+  const feedback = useAdminFeedback();
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -75,6 +77,15 @@ export function AdminDashboard() {
             <MessageSquareWarning size={16} />
             Complaints
           </button>
+          <button
+            onClick={() => setActiveTab('ratings')}
+            className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition ${
+              activeTab === 'ratings' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+          >
+            <Star size={16} />
+            Ratings
+          </button>
         </div>
 
         {activeTab === 'overview' && (
@@ -110,6 +121,13 @@ export function AdminDashboard() {
           <div>
             {complaints.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
             {complaints.data && <ComplaintTable complaints={complaints.data} />}
+          </div>
+        )}
+
+        {activeTab === 'ratings' && (
+          <div>
+            {feedback.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
+            {feedback.data && <RatingsTable feedback={feedback.data} />}
           </div>
         )}
       </div>

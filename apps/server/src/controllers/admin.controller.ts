@@ -5,6 +5,7 @@ import {
   getAllPickups,
   updatePickupStatus,
   getDashboardStats,
+  getAllFeedback,
   AdminError,
 } from '../services/admin.service';
 
@@ -53,6 +54,16 @@ export async function dashboard(_req: AuthenticatedRequest, res: Response) {
   try {
     const stats = await getDashboardStats();
     return res.status(200).json({ stats });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+}
+
+export async function listFeedback(_req: AuthenticatedRequest, res: Response) {
+  try {
+    const feedback = await getAllFeedback();
+    return res.status(200).json({ feedback });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });

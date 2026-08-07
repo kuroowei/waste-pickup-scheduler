@@ -3,18 +3,21 @@ import { Calendar, Clock, MapPin, Trash2, Star } from 'lucide-react';
 import type { PickupRequest } from '../types';
 import { StatusBadge } from './StatusBadge';
 import { RatePickupForm } from './RatePickupForm';
+import { StarRating } from './StarRating';
+import type { Feedback } from '../api/feedback';
 
 interface PickupCardProps {
   pickup: PickupRequest;
   onCancel?: (id: string) => void;
   isCancelling?: boolean;
   allowRating?: boolean;
+  existingFeedback?: Feedback;
 }
 
-export function PickupCard({ pickup, onCancel, isCancelling, allowRating }: PickupCardProps) {
+export function PickupCard({ pickup, onCancel, isCancelling, allowRating, existingFeedback }: PickupCardProps) {
   const [showRateForm, setShowRateForm] = useState(false);
   const canCancel = onCancel && pickup.status !== 'CANCELLED' && pickup.status !== 'COMPLETED';
-  const canRate = allowRating && pickup.status === 'COMPLETED';
+  const canRate = allowRating && pickup.status === 'COMPLETED' && !existingFeedback;
 
   const formattedDate = new Date(pickup.pickupDate).toLocaleDateString('en-US', {
     weekday: 'short',
@@ -70,6 +73,18 @@ export function PickupCard({ pickup, onCancel, isCancelling, allowRating }: Pick
 
       {canRate && showRateForm && (
         <RatePickupForm pickupId={pickup.id} onDone={() => setShowRateForm(false)} />
+      )}
+
+      {existingFeedback && (
+        <div className="mt-3 rounded-lg bg-amber-50 border border-amber-100 p-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-amber-800">Your rating</span>
+            <StarRating value={existingFeedback.rating} readOnly size={14} />
+          </div>
+          {existingFeedback.comments && (
+            <p className="text-sm text-slate-600 mt-1 italic">"{existingFeedback.comments}"</p>
+          )}
+        </div>
       )}
     </div>
   );
