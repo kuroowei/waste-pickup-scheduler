@@ -1,15 +1,21 @@
-import { Calendar, Clock, MapPin, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, Clock, MapPin, Trash2, Star } from 'lucide-react';
 import type { PickupRequest } from '../types';
 import { StatusBadge } from './StatusBadge';
+import { RatePickupForm } from './RatePickupForm';
 
 interface PickupCardProps {
   pickup: PickupRequest;
   onCancel?: (id: string) => void;
   isCancelling?: boolean;
+  allowRating?: boolean;
 }
 
-export function PickupCard({ pickup, onCancel, isCancelling }: PickupCardProps) {
+export function PickupCard({ pickup, onCancel, isCancelling, allowRating }: PickupCardProps) {
+  const [showRateForm, setShowRateForm] = useState(false);
   const canCancel = onCancel && pickup.status !== 'CANCELLED' && pickup.status !== 'COMPLETED';
+  const canRate = allowRating && pickup.status === 'COMPLETED';
+
   const formattedDate = new Date(pickup.pickupDate).toLocaleDateString('en-US', {
     weekday: 'short',
     month: 'short',
@@ -40,15 +46,30 @@ export function PickupCard({ pickup, onCancel, isCancelling }: PickupCardProps) 
         <StatusBadge status={pickup.status} />
       </div>
 
-      {canCancel && (
-        <button
-          onClick={() => onCancel(pickup.id)}
-          disabled={isCancelling}
-          className="mt-3 flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
-        >
-          <Trash2 size={14} />
-          {isCancelling ? 'Cancelling...' : 'Cancel pickup'}
-        </button>
+      <div className="flex items-center gap-4 mt-3">
+        {canCancel && (
+          <button
+            onClick={() => onCancel(pickup.id)}
+            disabled={isCancelling}
+            className="flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
+          >
+            <Trash2 size={14} />
+            {isCancelling ? 'Cancelling...' : 'Cancel pickup'}
+          </button>
+        )}
+        {canRate && !showRateForm && (
+          <button
+            onClick={() => setShowRateForm(true)}
+            className="flex items-center gap-1.5 text-sm text-amber-600 hover:text-amber-700"
+          >
+            <Star size={14} />
+            Rate this pickup
+          </button>
+        )}
+      </div>
+
+      {canRate && showRateForm && (
+        <RatePickupForm pickupId={pickup.id} onDone={() => setShowRateForm(false)} />
       )}
     </div>
   );

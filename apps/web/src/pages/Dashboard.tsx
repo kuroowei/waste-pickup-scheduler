@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { LogOut, Plus, Calendar, History } from 'lucide-react';
+import { LogOut, Plus, Calendar, History, MessageSquareWarning } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUpcomingPickups, usePickupHistory, useCancelPickup } from '../hooks/usePickups';
 import { PickupCard } from '../components/PickupCard';
 import { ScheduleForm } from '../components/ScheduleForm';
+import { ComplaintForm } from '../components/ComplaintForm';
 
-type Tab = 'upcoming' | 'schedule' | 'history';
+type Tab = 'upcoming' | 'schedule' | 'history' | 'complaints';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -62,6 +63,15 @@ export function Dashboard() {
             <History size={16} />
             History
           </button>
+          <button
+            onClick={() => setActiveTab('complaints')}
+            className={`flex-1 flex items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium transition ${
+              activeTab === 'complaints' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+          >
+            <MessageSquareWarning size={16} />
+            Complaints
+          </button>
         </div>
 
         {activeTab === 'upcoming' && (
@@ -102,8 +112,14 @@ export function Dashboard() {
               <p className="text-center py-12 text-slate-400">No pickup history yet</p>
             )}
             {history.data?.map((pickup) => (
-              <PickupCard key={pickup.id} pickup={pickup} />
+              <PickupCard key={pickup.id} pickup={pickup} allowRating />
             ))}
+          </div>
+        )}
+
+        {activeTab === 'complaints' && (
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <ComplaintForm />
           </div>
         )}
       </div>

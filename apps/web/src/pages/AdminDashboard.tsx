@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { LogOut, Users, Truck, LayoutDashboard, Clock, CheckCircle2, XCircle, CalendarDays } from 'lucide-react';
+import { LogOut, Users, Truck, LayoutDashboard, Clock, CheckCircle2, XCircle, CalendarDays, MessageSquareWarning } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdminStats, useAdminUsers, useAdminPickups } from '../hooks/useAdmin';
+import { useAllComplaints } from '../hooks/useComplaints';
 import { StatsCard } from '../components/StatsCard';
 import { UserTable } from '../components/UserTable';
 import { AdminPickupTable } from '../components/AdminPickupTable';
+import { ComplaintTable } from '../components/ComplaintTable';
 
-type Tab = 'overview' | 'users' | 'pickups';
+type Tab = 'overview' | 'users' | 'pickups' | 'complaints';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -15,6 +17,7 @@ export function AdminDashboard() {
   const stats = useAdminStats();
   const users = useAdminUsers();
   const pickups = useAdminPickups();
+  const complaints = useAllComplaints();
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -35,7 +38,7 @@ export function AdminDashboard() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
-        <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-6 w-fit">
+        <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-6 w-fit flex-wrap">
           <button
             onClick={() => setActiveTab('overview')}
             className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition ${
@@ -62,6 +65,15 @@ export function AdminDashboard() {
           >
             <Truck size={16} />
             Pickups
+          </button>
+          <button
+            onClick={() => setActiveTab('complaints')}
+            className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition ${
+              activeTab === 'complaints' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+          >
+            <MessageSquareWarning size={16} />
+            Complaints
           </button>
         </div>
 
@@ -91,6 +103,13 @@ export function AdminDashboard() {
           <div>
             {pickups.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
             {pickups.data && <AdminPickupTable pickups={pickups.data} />}
+          </div>
+        )}
+
+        {activeTab === 'complaints' && (
+          <div>
+            {complaints.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
+            {complaints.data && <ComplaintTable complaints={complaints.data} />}
           </div>
         )}
       </div>
