@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, Users, Truck, LayoutDashboard, Clock, CheckCircle2, XCircle, CalendarDays, MessageSquareWarning, Star } from 'lucide-react';
+import { LogOut, Users, Truck, LayoutDashboard, Clock, CheckCircle2, XCircle, CalendarDays, MessageSquareWarning, Star, Megaphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdminStats, useAdminUsers, useAdminPickups, useAdminFeedback } from '../hooks/useAdmin';
 import { useAllComplaints } from '../hooks/useComplaints';
@@ -8,8 +8,9 @@ import { UserTable } from '../components/UserTable';
 import { AdminPickupTable } from '../components/AdminPickupTable';
 import { ComplaintTable } from '../components/ComplaintTable';
 import { RatingsTable } from '../components/RatingsTable';
+import { AnnouncementManager } from '../components/AnnouncementManager';
 
-type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings';
+type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings' | 'announcements';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -86,6 +87,15 @@ export function AdminDashboard() {
             <Star size={16} />
             Ratings
           </button>
+          <button
+            onClick={() => setActiveTab('announcements')}
+            className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition ${
+              activeTab === 'announcements' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+          >
+            <Megaphone size={16} />
+            Announcements
+          </button>
         </div>
 
         {activeTab === 'overview' && (
@@ -130,6 +140,8 @@ export function AdminDashboard() {
             {feedback.data && <RatingsTable feedback={feedback.data} />}
           </div>
         )}
+
+        {activeTab === 'announcements' && <AnnouncementManager />}
       </div>
     </div>
   );
