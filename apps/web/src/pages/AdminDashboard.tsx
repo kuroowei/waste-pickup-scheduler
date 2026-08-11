@@ -9,11 +9,13 @@ import { AdminPickupTable } from '../components/AdminPickupTable';
 import { ComplaintTable } from '../components/ComplaintTable';
 import { RatingsTable } from '../components/RatingsTable';
 import { AnnouncementManager } from '../components/AnnouncementManager';
+import { useNavigate } from 'react-router-dom';
 
 type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings' | 'announcements';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
   const stats = useAdminStats();
@@ -31,8 +33,11 @@ export function AdminDashboard() {
             <p className="text-sm text-slate-500">Waste Pickup Scheduler management</p>
           </div>
           <button
-            onClick={logout}
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition"
+            onClick={() => {
+              navigate('/');
+              logout();
+            }}
+            className="flex items-center gap-1.5 text-sm text-slate-900 hover:text-slate-900 transition"
           >
             <LogOut size={16} />
             Log out

@@ -16,7 +16,7 @@ export function Login() {
     setIsSubmitting(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Something went wrong. Please try again.');
     } finally {

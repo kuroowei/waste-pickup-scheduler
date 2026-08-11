@@ -19,7 +19,7 @@ export function Register() {
     setIsSubmitting(true);
     try {
       await register({ fullName, email, password, phone, address });
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Something went wrong. Please try again.');
     } finally {

@@ -8,13 +8,14 @@ import { PickupCard } from '../components/PickupCard';
 import { ScheduleForm } from '../components/ScheduleForm';
 import { ComplaintForm } from '../components/ComplaintForm';
 import { AnnouncementCard } from '../components/AnnouncementCard';
-
+import { useNavigate } from 'react-router-dom';
 type Tab = 'upcoming' | 'schedule' | 'history' | 'complaints' | 'announcements';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('upcoming');
-
+ 
   const upcoming = useUpcomingPickups();
   const history = usePickupHistory();
   const cancelPickup = useCancelPickup();
@@ -30,7 +31,10 @@ export function Dashboard() {
             <p className="text-sm text-slate-500">{user?.address || 'No address on file'}</p>
           </div>
           <button
-            onClick={logout}
+            onClick={() => {
+              navigate('/');
+              logout();
+            }}
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition"
           >
             <LogOut size={16} />
