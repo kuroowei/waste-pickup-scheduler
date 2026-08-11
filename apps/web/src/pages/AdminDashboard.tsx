@@ -61,6 +61,7 @@ export function AdminDashboard() {
         userName={user?.fullName}
         userSubtitle="Administrator"
         onLogout={handleLogout}
+        homePath="/admin"
       />
 
       <div className="flex-1 min-w-0">

@@ -15,12 +15,13 @@ interface SidebarProps {
   userName?: string;
   userSubtitle?: string;
   onLogout: () => void;
+  homePath: string;
 }
 
-export function Sidebar({ navItems, activeKey, onSelect, userName, userSubtitle, onLogout }: SidebarProps) {
+export function Sidebar({ navItems, activeKey, onSelect, userName, userSubtitle, onLogout, homePath }: SidebarProps) {
   return (
     <aside className="hidden md:flex md:flex-col w-64 shrink-0 border-r border-slate-200 bg-white h-screen sticky top-0">
-      <Link to="/" className="flex items-center gap-2 px-5 py-5 border-b border-slate-100">
+      <Link to={homePath} className="flex items-center gap-2 px-5 py-5 border-b border-slate-100">
         <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
           <Truck size={18} className="text-white" />
         </div>

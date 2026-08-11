@@ -48,6 +48,7 @@ export function Dashboard() {
         userName={user?.fullName}
         userSubtitle={user?.address || 'Resident'}
         onLogout={handleLogout}
+        homePath="/dashboard"
       />
 
       <div className="flex-1 min-w-0">
