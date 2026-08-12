@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import prisma from '../config/prisma';
 import { signAccessToken, signRefreshToken, TokenPayload } from '../utils/jwt';
+import crypto from 'crypto';
 
 const SALT_ROUNDS = 12;
 
@@ -22,7 +23,7 @@ interface RegisterInput {
 }
 
 function sanitizeUser(user: Record<string, unknown>) {
-  const { password, ...safeUser } = user;
+  const { password, resetToken, resetTokenExpiresAt, ...safeUser } = user;
   return safeUser;
 }
 
@@ -74,4 +75,56 @@ export async function getCurrentUser(userId: string) {
     throw new AuthError('User not found', 404);
   }
   return sanitizeUser(user);
+}
+
+export async function requestPasswordReset(email: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  // Deliberately don't reveal whether the email exists — always succeed silently.
+  // This prevents attackers from using this endpoint to discover registered emails.
+  if (!user) {
+    return;
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetTokenExpiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { resetToken, resetTokenExpiresAt },
+  });
+
+  // TODO: send this via email once Nodemailer is wired up.
+  // For now, printed to the server console so it can be tested end-to-end.
+  const resetLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+  console.log('\n========================================');
+  console.log('PASSWORD RESET REQUESTED');
+  console.log(`User: ${user.email}`);
+  console.log(`Reset link: ${resetLink}`);
+  console.log(`Expires: ${resetTokenExpiresAt.toISOString()}`);
+  console.log('========================================\n');
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiresAt: { gt: new Date() },
+    },
+  });
+
+  if (!user) {
+    throw new AuthError('This reset link is invalid or has expired', 400);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpiresAt: null,
+    },
+  });
 }
