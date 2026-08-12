@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Truck, Bell, MapPin, ShieldCheck, Calendar, Star } from 'lucide-react';
+import truckLeft from '../assets/landing/truck-left.jpg';
+import binLeft from '../assets/landing/bin-left.jpg';
+import truckRight from '../assets/landing/truck-right.jpg';
+import binRight from '../assets/landing/bin-right.jpg';
 
 export function Landing() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-hidden">
       <nav className="border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -26,32 +30,63 @@ export function Landing() {
         </div>
       </nav>
 
-      <section className="max-w-3xl mx-auto px-4 pt-20 pb-16 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 text-emerald-700 text-sm font-medium px-3 py-1 mb-6">
-          <Truck size={14} />
-          Now serving Yenagoa and Amassoma
-        </span>
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
-          Reliable waste pickup for{' '}
-          <span className="text-emerald-600">modern communities</span>
-        </h1>
-        <p className="mt-4 text-lg text-slate-500">
-          Schedule pickups, track collection status, and stay informed — all in one place.
-          No more guessing when the truck is coming.
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <Link
-            to="/register"
-            className="bg-emerald-600 text-white font-medium rounded-lg px-6 py-3 hover:bg-emerald-700 transition"
-          >
-            Schedule your first pickup
-          </Link>
-          <Link
-            to="/login"
-            className="border border-slate-300 text-slate-700 font-medium rounded-lg px-6 py-3 hover:bg-slate-50 transition"
-          >
-            Sign In
-          </Link>
+      <section className="relative max-w-6xl mx-auto px-4 pt-16 pb-20">
+        {/* Left image cluster */}
+        <div className="hidden lg:block absolute left-0 top-8 w-52">
+          <img
+            src={truckLeft}
+            alt="Waste collection truck"
+            className="w-44 rounded-2xl shadow-xl object-cover h-32 -rotate-3"
+          />
+          <img
+            src={binLeft}
+            alt="Recycling bins"
+            className="w-36 rounded-2xl shadow-xl object-cover h-28 rotate-2 mt-4 ml-12 border-4 border-white"
+          />
+        </div>
+
+        {/* Right image cluster */}
+        <div className="hidden lg:block absolute right-0 top-8 w-52">
+          <img
+            src={truckRight}
+            alt="Waste pickup vehicle"
+            className="w-44 rounded-2xl shadow-xl object-cover h-32 rotate-3 ml-8"
+          />
+          <img
+            src={binRight}
+            alt="Waste sorting bins"
+            className="w-36 rounded-2xl shadow-xl object-cover h-28 -rotate-2 mt-4 border-4 border-white"
+          />
+        </div>
+
+        {/* Hero content */}
+        <div className="max-w-3xl mx-auto text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 text-emerald-700 text-sm font-medium px-3 py-1 mb-6">
+            <Truck size={14} />
+            Now serving Yenagoa and Amassoma
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
+            Reliable waste pickup for{' '}
+            <span className="text-emerald-600">modern communities</span>
+          </h1>
+          <p className="mt-4 text-lg text-slate-500">
+            Schedule pickups, track collection status, and stay informed — all in one place.
+            No more guessing when the truck is coming.
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Link
+              to="/register"
+              className="bg-emerald-600 text-white font-medium rounded-lg px-6 py-3 hover:bg-emerald-700 transition"
+            >
+              Schedule your first pickup
+            </Link>
+            <Link
+              to="/login"
+              className="border border-slate-300 text-slate-700 font-medium rounded-lg px-6 py-3 hover:bg-slate-50 transition"
+            >
+              Sign In
+            </Link>
+          </div>
         </div>
       </section>
 
