@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import prisma from '../config/prisma';
 import { signAccessToken, signRefreshToken, TokenPayload } from '../utils/jwt';
 import crypto from 'crypto';
+import { sendPasswordResetEmail } from './email.service';
 
 const SALT_ROUNDS = 12;
 
@@ -94,15 +95,9 @@ export async function requestPasswordReset(email: string) {
     data: { resetToken, resetTokenExpiresAt },
   });
 
-  // TODO: send this via email once Nodemailer is wired up.
-  // For now, printed to the server console so it can be tested end-to-end.
+  
   const resetLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
-  console.log('\n========================================');
-  console.log('PASSWORD RESET REQUESTED');
-  console.log(`User: ${user.email}`);
-  console.log(`Reset link: ${resetLink}`);
-  console.log(`Expires: ${resetTokenExpiresAt.toISOString()}`);
-  console.log('========================================\n');
+  await sendPasswordResetEmail(user.email, resetLink);
 }
 
 export async function resetPassword(token: string, newPassword: string) {
