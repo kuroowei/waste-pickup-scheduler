@@ -32,7 +32,7 @@ export async function create(req: AuthenticatedRequest, res: Response) {
 export async function update(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user!.userId;
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const pickup = await updatePickup(id, userId, req.body);
     return res.status(200).json({ pickup });
   } catch (err) {
@@ -47,7 +47,7 @@ export async function update(req: AuthenticatedRequest, res: Response) {
 export async function remove(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user!.userId;
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     await deletePickup(id, userId);
     return res.status(200).json({ message: 'Pickup cancelled successfully' });
   } catch (err) {

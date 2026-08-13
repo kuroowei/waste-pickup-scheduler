@@ -35,7 +35,7 @@ export async function list(_req: AuthenticatedRequest, res: Response) {
 
 export async function remove(req: AuthenticatedRequest, res: Response) {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     await deleteAnnouncement(id);
     return res.status(200).json({ message: 'Announcement deleted' });
   } catch (err) {

@@ -51,7 +51,7 @@ export async function adminList(_req: AuthenticatedRequest, res: Response) {
 
 export async function adminUpdateStatus(req: AuthenticatedRequest, res: Response) {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const { status } = req.body;
 
     if (!status) {

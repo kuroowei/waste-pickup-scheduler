@@ -32,7 +32,7 @@ export async function listPickups(req: AuthenticatedRequest, res: Response) {
 
 export async function updateStatus(req: AuthenticatedRequest, res: Response) {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const { status } = req.body;
 
     if (!status) {
