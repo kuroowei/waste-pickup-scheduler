@@ -1,4 +1,5 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { useCreateComplaint } from '../hooks/useComplaints';
 
 export function ComplaintForm({ onSuccess }: { onSuccess?: () => void }) {
