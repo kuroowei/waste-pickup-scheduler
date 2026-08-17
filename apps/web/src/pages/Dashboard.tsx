@@ -76,7 +76,7 @@ export function Dashboard() {
             </h1>
           </div>
 
-          {announcements.data && announcements.data.length > 0 && (
+          {activeTab !== 'announcements' && announcements.data && announcements.data.length > 0 && (
             <div className="mb-6">
               {announcements.data.slice(0, 1).map((a) => (
                 <AnnouncementCard key={a.id} announcement={a} />
