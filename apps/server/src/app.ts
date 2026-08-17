@@ -10,6 +10,7 @@ import adminRoutes from './routes/admin.routes';
 import feedbackRoutes from './routes/feedback.routes';
 import complaintRoutes from './routes/complaint.routes';
 import announcementRoutes from './routes/announcement.routes';
+import notificationRoutes from './routes/notification.routes';
 const app = express();
 app.use(helmet());
 const allowedOrigins = [
@@ -26,6 +27,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'waste-pickup-scheduler-api' });
 });

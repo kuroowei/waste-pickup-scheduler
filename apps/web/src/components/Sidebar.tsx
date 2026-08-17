@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Truck, LogOut } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-
 export interface SidebarNavItem {
   key: string;
   label: string;
   icon: LucideIcon;
+  badge?: number;
 }
-
 interface SidebarProps {
   navItems: SidebarNavItem[];
   activeKey: string;
@@ -17,7 +16,6 @@ interface SidebarProps {
   onLogout: () => void;
   homePath: string;
 }
-
 export function Sidebar({ navItems, activeKey, onSelect, userName, userSubtitle, onLogout, homePath }: SidebarProps) {
   return (
     <aside className="hidden md:flex md:flex-col w-64 shrink-0 bg-emerald-900 h-screen sticky top-0">
@@ -27,7 +25,6 @@ export function Sidebar({ navItems, activeKey, onSelect, userName, userSubtitle,
         </div>
         <span className="font-semibold text-white">WastePickup</span>
       </Link>
-
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -43,12 +40,16 @@ export function Sidebar({ navItems, activeKey, onSelect, userName, userSubtitle,
               }`}
             >
               <Icon size={18} className={isActive ? 'text-white' : 'text-emerald-300'} />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {!!item.badge && item.badge > 0 && (
+                <span className="bg-red-500 text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {item.badge > 9 ? '9+' : item.badge}
+                </span>
+              )}
             </button>
           );
         })}
       </nav>
-
       <div className="border-t border-emerald-800 px-5 py-4">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white font-medium text-sm shrink-0">

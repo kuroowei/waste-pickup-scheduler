@@ -1,27 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Plus, History, MessageSquareWarning, Megaphone } from 'lucide-react';
+import { Calendar, Plus, History, MessageSquareWarning, Megaphone, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUpcomingPickups, usePickupHistory, useCancelPickup } from '../hooks/usePickups';
 import { useMyFeedback } from '../hooks/useFeedback';
 import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '../hooks/useNotifications';
 import { PickupCard } from '../components/PickupCard';
 import { ScheduleForm } from '../components/ScheduleForm';
 import { ComplaintForm } from '../components/ComplaintForm';
 import { AnnouncementCard } from '../components/AnnouncementCard';
+import { NotificationCard } from '../components/NotificationCard';
 import { Sidebar } from '../components/Sidebar';
 import type { SidebarNavItem } from '../components/Sidebar';
 import { MobileTopBar } from '../components/MobileTopBar';
 
-type Tab = 'upcoming' | 'schedule' | 'history' | 'complaints' | 'announcements';
-
-const NAV_ITEMS: SidebarNavItem[] = [
-  { key: 'upcoming', label: 'Upcoming', icon: Calendar },
-  { key: 'schedule', label: 'Schedule New', icon: Plus },
-  { key: 'history', label: 'History', icon: History },
-  { key: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
-  { key: 'announcements', label: 'Announcements', icon: Megaphone },
-];
+type Tab = 'upcoming' | 'schedule' | 'history' | 'complaints' | 'announcements' | 'notifications';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -33,6 +27,20 @@ export function Dashboard() {
   const cancelPickup = useCancelPickup();
   const myFeedback = useMyFeedback();
   const announcements = useAnnouncements();
+  const notifications = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
+
+  const unreadCount = notifications.data?.filter((n) => !n.isRead).length ?? 0;
+
+  const NAV_ITEMS: SidebarNavItem[] = [
+    { key: 'upcoming', label: 'Upcoming', icon: Calendar },
+    { key: 'schedule', label: 'Schedule New', icon: Plus },
+    { key: 'history', label: 'History', icon: History },
+    { key: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
+    { key: 'announcements', label: 'Announcements', icon: Megaphone },
+    { key: 'notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
+  ];
 
   function handleLogout() {
     navigate('/');
@@ -65,6 +73,11 @@ export function Dashboard() {
             >
               <item.icon size={14} />
               {item.label}
+              {!!item.badge && item.badge > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1">
+                  {item.badge > 9 ? '9+' : item.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -146,6 +159,34 @@ export function Dashboard() {
               )}
               {announcements.data?.map((a) => (
                 <AnnouncementCard key={a.id} announcement={a} />
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <div className="space-y-3">
+              {notifications.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
+              {notifications.data?.length === 0 && (
+                <p className="text-center py-12 text-slate-400">No notifications yet</p>
+              )}
+              {unreadCount > 0 && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => markAllRead.mutate()}
+                    disabled={markAllRead.isPending}
+                    className="text-xs text-slate-500 font-medium hover:underline"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+              )}
+              {notifications.data?.map((n) => (
+                <NotificationCard
+                  key={n.id}
+                  notification={n}
+                  onMarkRead={(id) => markRead.mutate(id)}
+                  isMarking={markRead.isPending && markRead.variables === n.id}
+                />
               ))}
             </div>
           )}
