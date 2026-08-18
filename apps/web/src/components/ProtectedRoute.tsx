@@ -1,9 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
-export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Array<'RESIDENT' | 'ADMIN'> }) {
+export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Array<'RESIDENT' | 'ADMIN' | 'DRIVER'> }) {
   const { user, isLoading } = useAuth();
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -11,14 +9,11 @@ export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Array<'RESIDEN
       </div>
     );
   }
-
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
-
   return <Outlet />;
 }

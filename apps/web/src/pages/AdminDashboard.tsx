@@ -11,30 +11,25 @@ import {
   MessageSquareWarning,
   Star,
   Megaphone,
+  Bell,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useAdminStats, useAdminUsers, useAdminPickups, useAdminFeedback } from '../hooks/useAdmin';
+import { useAdminStats, useAdminUsers, useAdminPickups, useAdminFeedback, useAdminTrucks } from '../hooks/useAdmin';
 import { useAllComplaints } from '../hooks/useComplaints';
+import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '../hooks/useNotifications';
 import { StatsCard } from '../components/StatsCard';
 import { UserTable } from '../components/UserTable';
 import { AdminPickupTable } from '../components/AdminPickupTable';
 import { ComplaintTable } from '../components/ComplaintTable';
 import { RatingsTable } from '../components/RatingsTable';
 import { AnnouncementManager } from '../components/AnnouncementManager';
+import { FleetTable } from '../components/FleetTable';
+import { NotificationCard } from '../components/NotificationCard';
 import { Sidebar } from '../components/Sidebar';
 import type { SidebarNavItem } from '../components/Sidebar';
 import { MobileTopBar } from '../components/MobileTopBar';
 
-type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings' | 'announcements';
-
-const NAV_ITEMS: SidebarNavItem[] = [
-  { key: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { key: 'users', label: 'Users', icon: Users },
-  { key: 'pickups', label: 'Pickups', icon: Truck },
-  { key: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
-  { key: 'ratings', label: 'Ratings', icon: Star },
-  { key: 'announcements', label: 'Announcements', icon: Megaphone },
-];
+type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings' | 'announcements' | 'fleet' | 'notifications';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -46,6 +41,23 @@ export function AdminDashboard() {
   const pickups = useAdminPickups();
   const complaints = useAllComplaints();
   const feedback = useAdminFeedback();
+  const trucks = useAdminTrucks();
+  const notifications = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
+
+  const unreadCount = notifications.data?.filter((n) => !n.isRead).length ?? 0;
+
+  const NAV_ITEMS: SidebarNavItem[] = [
+    { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { key: 'users', label: 'Users', icon: Users },
+    { key: 'pickups', label: 'Pickups', icon: Truck },
+    { key: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
+    { key: 'ratings', label: 'Ratings', icon: Star },
+    { key: 'announcements', label: 'Announcements', icon: Megaphone },
+    { key: 'fleet', label: 'Fleet', icon: Truck },
+    { key: 'notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
+  ];
 
   function handleLogout() {
     navigate('/');
@@ -78,6 +90,11 @@ export function AdminDashboard() {
             >
               <item.icon size={14} />
               {item.label}
+              {!!item.badge && item.badge > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1">
+                  {item.badge > 9 ? '9+' : item.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -134,6 +151,41 @@ export function AdminDashboard() {
           )}
 
           {activeTab === 'announcements' && <AnnouncementManager />}
+
+          {activeTab === 'fleet' && (
+            <div>
+              {trucks.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
+              {trucks.data && <FleetTable trucks={trucks.data} />}
+            </div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <div className="space-y-3">
+              {notifications.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
+              {notifications.data?.length === 0 && (
+                <p className="text-center py-12 text-slate-400">No notifications yet</p>
+              )}
+              {unreadCount > 0 && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => markAllRead.mutate()}
+                    disabled={markAllRead.isPending}
+                    className="text-xs text-slate-500 font-medium hover:underline"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+              )}
+              {notifications.data?.map((n) => (
+                <NotificationCard
+                  key={n.id}
+                  notification={n}
+                  onMarkRead={(id) => markRead.mutate(id)}
+                  isMarking={markRead.isPending && markRead.variables === n.id}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

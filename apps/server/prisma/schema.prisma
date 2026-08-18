@@ -4,16 +4,14 @@ generator client {
      moduleFormat = "cjs"
      importFileExtension = "ts"
    }
-
 datasource db {
   provider = "postgresql"
 }
-
 enum Role {
   RESIDENT
   ADMIN
+  DRIVER
 }
-
 enum PickupStatus {
   PENDING
   SCHEDULED
@@ -22,13 +20,16 @@ enum PickupStatus {
   CANCELLED
   SKIPPED
 }
-
 enum ComplaintStatus {
   OPEN
   IN_REVIEW
   RESOLVED
 }
-
+enum TruckStatus {
+  AVAILABLE
+  ON_ROUTE
+  MAINTENANCE
+}
 model User {
   id                   String          @id @default(cuid())
   fullName             String
@@ -44,15 +45,25 @@ model User {
   feedback             Feedback[]
   complaints           Complaint[]
   notifications        Notification[]
+  truck                Truck?
 }
-
 model WasteType {
   id          String          @id @default(cuid())
   name        String          @unique
   description String?
   pickups     PickupRequest[]
 }
-
+model Truck {
+  id           String          @id @default(cuid())
+  name         String
+  plateNumber  String          @unique
+  status       TruckStatus     @default(AVAILABLE)
+  driverId     String?         @unique
+  driver       User?           @relation(fields: [driverId], references: [id])
+  lastAssignedAt DateTime?
+  createdAt    DateTime        @default(now())
+  pickups      PickupRequest[]
+}
 model PickupRequest {
   id          String       @id @default(cuid())
   userId      String
@@ -69,8 +80,9 @@ model PickupRequest {
   createdAt   DateTime     @default(now())
   feedback    Feedback?
   complaints  Complaint[]
+  truckId     String?
+  truck       Truck?       @relation(fields: [truckId], references: [id])
 }
-
 model Feedback {
   id        String        @id @default(cuid())
   userId    String
@@ -81,7 +93,6 @@ model Feedback {
   comments  String?
   createdAt DateTime      @default(now())
 }
-
 model Complaint {
   id        String          @id @default(cuid())
   userId    String
@@ -93,7 +104,6 @@ model Complaint {
   status    ComplaintStatus @default(OPEN)
   createdAt DateTime        @default(now())
 }
-
 model Notification {
   id        String   @id @default(cuid())
   title     String
@@ -103,7 +113,6 @@ model Notification {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
-
 model Announcement {
   id            String   @id @default(cuid())
   title         String

@@ -6,9 +6,9 @@ import {
   updatePickupStatus,
   getDashboardStats,
   getAllFeedback,
+  getAllTrucks,
   AdminError,
 } from '../services/admin.service';
-
 export async function listUsers(_req: AuthenticatedRequest, res: Response) {
   try {
     const users = await getAllUsers();
@@ -18,8 +18,7 @@ export async function listUsers(_req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }
-
-export async function listPickups(req: AuthenticatedRequest, res: Response) {
+export async function listPickups(req: AuthenticatedRequest, res: Response){
   try {
     const status = req.query.status as string | undefined;
     const pickups = await getAllPickups({ status: status as any });
@@ -29,16 +28,13 @@ export async function listPickups(req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }
-
 export async function updateStatus(req: AuthenticatedRequest, res: Response) {
   try {
     const { id } = req.params as { id: string };
     const { status } = req.body;
-
     if (!status) {
       return res.status(400).json({ error: 'Status is required' });
     }
-
     const pickup = await updatePickupStatus(id, status);
     return res.status(200).json({ pickup });
   } catch (err) {
@@ -49,7 +45,6 @@ export async function updateStatus(req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }
-
 export async function dashboard(_req: AuthenticatedRequest, res: Response) {
   try {
     const stats = await getDashboardStats();
@@ -59,11 +54,19 @@ export async function dashboard(_req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }
-
 export async function listFeedback(_req: AuthenticatedRequest, res: Response) {
   try {
     const feedback = await getAllFeedback();
     return res.status(200).json({ feedback });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+}
+export async function listTrucks(_req: AuthenticatedRequest, res: Response) {
+  try {
+    const trucks = await getAllTrucks();
+    return res.status(200).json({ trucks });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
