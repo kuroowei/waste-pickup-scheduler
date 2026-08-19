@@ -1,6 +1,8 @@
+import bcrypt from 'bcrypt';
 import prisma from '../config/prisma';
 import { PickupStatus } from '../generated/prisma/enums';
 import { createNotification } from './notification.service';
+const SALT_ROUNDS = 12;
 export class AdminError extends Error {
   statusCode: number;
   constructor(message: string, statusCode: number = 400) {
@@ -136,4 +138,39 @@ export async function getAllTrucks() {
     },
     orderBy: { name: 'asc' },
   });
+}
+interface CreateDriverInput {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+export async function createDriverForTruck(truckId: string, input: CreateDriverInput) {
+  const truck = await prisma.truck.findUnique({ where: { id: truckId } });
+  if (!truck) {
+    throw new AdminError('Truck not found', 404);
+  }
+  if (truck.driverId) {
+    throw new AdminError('This truck already has a driver assigned', 400);
+  }
+  const existingUser = await prisma.user.findUnique({ where: { email: input.email } });
+  if (existingUser) {
+    throw new AdminError('A user with this email already exists', 400);
+  }
+  const hashedPassword = await bcrypt.hash(input.password, SALT_ROUNDS);
+  const driver = await prisma.user.create({
+    data: {
+      fullName: input.fullName,
+      email: input.email,
+      phone: input.phone,
+      password: hashedPassword,
+      role: 'DRIVER',
+    },
+  });
+  const updatedTruck = await prisma.truck.update({
+    where: { id: truckId },
+    data: { driverId: driver.id },
+    include: { driver: { select: { id: true, fullName: true, phone: true, email: true } } },
+  });
+  return updatedTruck;
 }

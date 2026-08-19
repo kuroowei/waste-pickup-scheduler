@@ -46,3 +46,13 @@ export async function getTrucks(): Promise<Truck[]> {
   const { data } = await apiClient.get('/admin/trucks');
   return data.trucks;
 }
+export interface CreateDriverInput {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+export async function createDriverForTruck(truckId: string, input: CreateDriverInput): Promise<Truck> {
+  const { data } = await apiClient.post(`/admin/trucks/${truckId}/driver`, input);
+  return data.truck;
+}

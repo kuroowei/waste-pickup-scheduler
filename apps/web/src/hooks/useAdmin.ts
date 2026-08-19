@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAdminStats, getAllUsers, getAllPickups, updatePickupStatus, getTrucks } from '../api/admin';
+import { getAdminStats, getAllUsers, getAllPickups, updatePickupStatus, getTrucks, createDriverForTruck } from '../api/admin';
+import type { CreateDriverInput } from '../api/admin';
 import type { PickupStatus } from '../types';
 import { getAllFeedback } from '../api/admin';
 export function useAdminStats() {
@@ -28,4 +29,14 @@ export function useAdminFeedback() {
 }
 export function useAdminTrucks() {
   return useQuery({ queryKey: ['admin', 'trucks'], queryFn: getTrucks });
+}
+export function useCreateDriverForTruck() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ truckId, input }: { truckId: string; input: CreateDriverInput }) =>
+      createDriverForTruck(truckId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'trucks'] });
+    },
+  });
 }
