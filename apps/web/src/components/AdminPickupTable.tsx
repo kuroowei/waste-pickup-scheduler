@@ -40,7 +40,7 @@ export function AdminPickupTable({ pickups }: { pickups: PickupRequest[] }) {
                   month: 'short',
                   day: 'numeric',
                 })}
-                {' · '}
+                {' - '}
                 {pickup.pickupTime}
               </td>
               <td className="px-4 py-3 text-slate-500 max-w-[200px] truncate">{pickup.address}</td>

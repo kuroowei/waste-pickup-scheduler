@@ -18,7 +18,7 @@ import { useAdminStats, useAdminUsers, useAdminPickups, useAdminFeedback, useAdm
 import { useAllComplaints } from '../hooks/useComplaints';
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '../hooks/useNotifications';
 import { StatsCard } from '../components/StatsCard';
-import { UserTable } from '../components/UserTable';
+import { ResidentsManagement } from '../components/ResidentsManagement';
 import { AdminPickupTable } from '../components/AdminPickupTable';
 import { ComplaintTable } from '../components/ComplaintTable';
 import { RatingsTable } from '../components/RatingsTable';
@@ -29,7 +29,7 @@ import { Sidebar } from '../components/Sidebar';
 import type { SidebarNavItem } from '../components/Sidebar';
 import { MobileTopBar } from '../components/MobileTopBar';
 
-type Tab = 'overview' | 'users' | 'pickups' | 'complaints' | 'ratings' | 'announcements' | 'fleet' | 'notifications';
+type Tab = 'overview' | 'residents' | 'pickups' | 'complaints' | 'ratings' | 'announcements' | 'fleet' | 'notifications';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -47,10 +47,11 @@ export function AdminDashboard() {
   const markAllRead = useMarkAllNotificationsRead();
 
   const unreadCount = notifications.data?.filter((n) => !n.isRead).length ?? 0;
+  const residents = users.data?.filter((u) => u.role === 'RESIDENT') ?? [];
 
   const NAV_ITEMS: SidebarNavItem[] = [
     { key: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { key: 'users', label: 'Users', icon: Users },
+    { key: 'residents', label: 'Residents Management', icon: Users },
     { key: 'pickups', label: 'Pickups', icon: Truck },
     { key: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
     { key: 'ratings', label: 'Ratings', icon: Star },
@@ -122,10 +123,12 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === 'users' && (
+          {activeTab === 'residents' && (
             <div>
-              {users.isLoading && <p className="text-slate-400 text-sm">Loading...</p>}
-              {users.data && <UserTable users={users.data} />}
+              {(users.isLoading || pickups.isLoading) && <p className="text-slate-400 text-sm">Loading...</p>}
+              {users.data && pickups.data && (
+                <ResidentsManagement residents={residents} pickups={pickups.data} />
+              )}
             </div>
           )}
 
